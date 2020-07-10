@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Form from './components/form/Form';
-import Listing from './components/listing/Listing';
 
 class App extends Component{
   constructor(){
@@ -9,10 +8,7 @@ class App extends Component{
   
   render(){
     return (
-      <div>
-        <Form />
-        <Listing />
-      </div>
+      <Form />
     );
   }
 }

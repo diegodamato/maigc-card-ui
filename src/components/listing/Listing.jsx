@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Table from '@material-ui/core/Table';
@@ -16,50 +16,63 @@ class Listing extends Component{
         super(props);
 
         this.state = {
-            data: []
+            data: this.props.dataTable
         }
         
-        this.getDataCard();
-        
+        this.getAllDataCard();
+                
     }
 
-    async getDataCard(){
+    
+    async getAllDataCard(){
         let dataTable = await new ClientHttp().getAllMagicCard();
         this.setState({
             data: dataTable.data
         })
+    
     }
 
     populateTable(){
-        return this.state.data.map(data => {
-            return  <TableRow key={data.id}>
-                        <TableCell align="center">
-                            <Button variant="contained" color="secondary" size="small" startIcon={<DeleteIcon />}>Apagar</Button>
-                        </TableCell>
-                        <TableCell align="center">{data.name}</TableCell>
-                        <TableCell align="center">{data.rarity}</TableCell>
-                    </TableRow>
-        })
+        if (this.state.data.length){
+            return this.state.data.map(data => {
+                return  <TableRow key={data.id}>
+                            <TableCell align="center">
+                                <Button variant="contained" color="secondary" size="small" startIcon={<DeleteIcon />}>Apagar</Button>
+                            </TableCell>
+                            <TableCell align="center">{data.name}</TableCell>
+                            <TableCell align="center">{data.rarity}</TableCell>
+                        </TableRow>
+            })
+        }
+    }
+
+    UNSAFE_componentWillReceiveProps(newProps){
+        if (newProps.dataTable.length){
+            this.setState({data: newProps.dataTable})
+        }
     }
 
     render(){
         return ( 
-            <div className='positionTable'>
-                <TableContainer component={Paper} >
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">Ação</TableCell>
-                                <TableCell align="center">Card Name</TableCell>
-                                <TableCell align="center">Rarity</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            { this.populateTable() }
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </div>
+            <Fragment>
+                <div className='positionTable'>
+                    <TableContainer component={Paper} >
+                        <Table aria-label="simple table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell align="center">Ação</TableCell>
+                                    <TableCell align="center">Card Name</TableCell>
+                                    <TableCell align="center">Rarity</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                { this.populateTable() }
+                               
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </div>
+            </Fragment>
         );
     }
 }
