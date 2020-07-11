@@ -32,12 +32,23 @@ class Listing extends Component{
     
     }
 
+    async removeCard(id){
+        try{
+            await new ClientHttp().deleteCard(id);
+            alert(`Card ${id} removido com sucesso`);
+            this.getAllDataCard();
+        }catch(err){
+            alert(`Erro ao remover card: ${id}`);
+        }
+        
+    }
+
     populateTable(){
         if (this.state.data.length){
             return this.state.data.map(data => {
                 return  <TableRow key={data.id}>
                             <TableCell align="center">
-                                <Button variant="contained" color="secondary" size="small" startIcon={<DeleteIcon />}>Apagar</Button>
+                                <Button variant="contained" color="secondary" onClick={() => this.removeCard(data.id)} size="small" startIcon={<DeleteIcon />}>Apagar</Button>
                             </TableCell>
                             <TableCell align="center">{data.name}</TableCell>
                             <TableCell align="center">{data.rarity}</TableCell>
