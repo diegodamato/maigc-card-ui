@@ -46,12 +46,14 @@ class Form extends Component {
   }
 
   async registerMagicCard() {
+
     this.setState({errors: {save: false}})
+    this.setState({validations: {requiredName: false}})
+    
     if (!this.state.cardName) {
       this.setState({validations: {requiredName: true}})
       return;
     }
-    this.setState({validations: {requiredName: false}})
     
     try {
       this.startLoading();
