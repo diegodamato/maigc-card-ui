@@ -8,7 +8,10 @@ import SaveIcon from '@material-ui/icons/Save';
 import FindIcon from '@material-ui/icons/FindInPageSharp';
 import ClientHttp from './../../ClientHttp';
 import Listing from './../listing/Listing';
+import LinearProgress from '@material-ui/core/LinearProgress'
+import Snackbar from '@material-ui/core/Snackbar'
 import './form.css';
+import Alert from '@material-ui/lab/Alert';
 
 class Form extends Component {
   constructor(props) {
@@ -16,7 +19,15 @@ class Form extends Component {
 
     this.state = {
       cardName: '',
-      dataTable: []
+      dataTable: [],
+      isLoading: false,
+      validations: {
+        requiredName: false
+      },
+      errors: {
+        find: false,
+        save: false
+      }
     }
 
     this.onChange = this.onChange.bind(this);
@@ -25,6 +36,7 @@ class Form extends Component {
   }
 
   async getMagicCard() {
+    this.setState({validations: {requiredName: false}});
     try {
       let result = await new ClientHttp().getMagicCard(this.state.cardName);
       this.setState({ dataTable: result.data });
@@ -34,19 +46,48 @@ class Form extends Component {
   }
 
   async registerMagicCard() {
+    this.setState({errors: {save: false}})
     if (!this.state.cardName) {
-      alert("Nome da carta é obrigatório");
+      this.setState({validations: {requiredName: true}})
       return;
     }
-
+    this.setState({validations: {requiredName: false}})
+    
     try {
+      this.startLoading();
       await new ClientHttp().saveMagicCard(this.state.cardName);
-      let result = await new ClientHttp().getAllMagicCard();
-      this.setState({ dataTable: result.data });
+      this.stopLoading();
+      this.refreshTable()
       alert(`Card ${this.state.cardName} gravado com sucesso!`);
     } catch (err) {
-      alert(`Erro ao gravar card ${this.state.cardName}: ${err}`)
+      this.stopLoading();
+      this.setState({errors: {save: true}})
     }
+  }
+
+  startLoading(){
+    this.setState({isLoading: true});
+  }
+
+  stopLoading(){
+    this.setState({isLoading: false});
+  }
+
+  showProgress(){
+    if(this.state.isLoading){
+      return <LinearProgress />
+    }
+  }
+
+  showAlertMessage(open, message, type){
+    return <Snackbar open={open} >
+             <Alert severity={type}>{message}</Alert>
+           </Snackbar>
+  }
+
+  async refreshTable(){
+    let result = await new ClientHttp().getAllMagicCard();
+    this.setState({ dataTable: result.data });
   }
 
   onChange(event) {
@@ -56,6 +97,11 @@ class Form extends Component {
   render() {
     return (
       <Fragment>
+        { this.showProgress() }
+        
+        { this.showAlertMessage(this.state.validations.requiredName, "Nome é obrigatório", "error")}
+        { this.showAlertMessage(this.state.errors.save, "Erro ao gravar card", "error")}
+        
         <CssBaseline />
         <Container maxWidth="sm">
           <div className='positionTextBox'>
@@ -70,6 +116,7 @@ class Form extends Component {
             </Box>
           </div>
         </Container>
+        
         <Listing dataTable={this.state.dataTable} />
       </Fragment>
     );
