@@ -33,6 +33,7 @@ class Form extends Component {
     this.onChange = this.onChange.bind(this);
     this.getMagicCard = this.getMagicCard.bind(this);
     this.registerMagicCard = this.registerMagicCard.bind(this);
+    this.cleanAlertMessage = this.cleanAlertMessage.bind(this);
   }
 
   async getMagicCard() {
@@ -46,9 +47,7 @@ class Form extends Component {
   }
 
   async registerMagicCard() {
-
-    this.setState({errors: {save: false}})
-    this.setState({validations: {requiredName: false}})
+    this.cleanAlertMessage();
     
     if (!this.state.cardName) {
       this.setState({validations: {requiredName: true}})
@@ -82,9 +81,14 @@ class Form extends Component {
   }
 
   showAlertMessage(open, message, type){
-    return <Snackbar open={open} >
-             <Alert severity={type}>{message}</Alert>
+    return <Snackbar open={open} autoHideDuration={6000} onClose={this.cleanAlertMessage}>
+             <Alert elevation={6} variant="filled" severity={type}>{message}</Alert>
            </Snackbar>
+  }
+
+  cleanAlertMessage(){
+    this.setState({errors: {save: false}})
+    this.setState({validations: {requiredName: false}})
   }
 
   async refreshTable(){
@@ -101,8 +105,8 @@ class Form extends Component {
       <Fragment>
         { this.showProgress() }
         
-        { this.showAlertMessage(this.state.validations.requiredName, "Nome é obrigatório", "error")}
-        { this.showAlertMessage(this.state.errors.save, "Erro ao gravar card", "error")}
+        { this.showAlertMessage(this.state.validations.requiredName, "Nome é obrigatório", "error") }
+        { this.showAlertMessage(this.state.errors.save, "Erro ao gravar card", "error") }
         
         <CssBaseline />
         <Container maxWidth="sm">
